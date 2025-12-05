@@ -96,6 +96,5 @@ Proyecto académico - Universidad Francisco de Paula Santander
 
 ---
 
-**Desarrollado por:** David Báez  
 **Programa:** Ingeniería de Sistemas  
-**Año:** 2024
+**Año:** 2025
