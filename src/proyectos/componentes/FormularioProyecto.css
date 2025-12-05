@@ -1,0 +1,435 @@
+/* Formulario Proyecto Styles */
+
+.formulario-modal {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.loading-catalogos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #c41e3a;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.formulario-header {
+    padding: 2rem 2rem 1.5rem;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.formulario-header h2 {
+    margin: 0 0 1.5rem 0;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+}
+
+.pasos-indicador {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.paso-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.paso-dot.activo {
+    background: #c41e3a;
+    color: white;
+}
+
+.paso-dot.actual {
+    box-shadow: 0 0 0 4px rgba(196, 30, 58, 0.2);
+}
+
+.paso-dot:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    width: 1rem;
+    height: 2px;
+    background: #e0e0e0;
+}
+
+.paso-dot.activo:not(:last-child)::after {
+    background: #c41e3a;
+}
+
+.paso-titulo {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.formulario-error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1rem;
+    margin: 1rem 2rem 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.formulario-paso {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #c41e3a;
+    box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group select:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.radio-option:hover {
+    border-color: #c41e3a;
+}
+
+.radio-option.selected {
+    border-color: #c41e3a;
+    background: #fff5f6;
+}
+
+.radio-option input {
+    display: none;
+}
+
+.radio-icon {
+    font-size: 1.5rem;
+}
+
+/* Director Preview */
+.director-preview {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #e8f5e9;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.director-avatar {
+    font-size: 2rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+}
+
+.director-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.director-nombre {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.director-email {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Paso 4: Compañeros */
+.paso-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #e3f2fd;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.paso-info .info-icon {
+    font-size: 1.25rem;
+}
+
+.paso-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #1565c0;
+}
+
+.estudiantes-sugerencias {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.estudiantes-sugerencias li {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.estudiantes-sugerencias li:last-child {
+    border-bottom: none;
+}
+
+.estudiantes-sugerencias li:hover {
+    background: #f8f9fa;
+}
+
+.sugerencia-nombre {
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.sugerencia-cedula {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.estudiantes-seleccionados {
+    margin-top: 1rem;
+}
+
+.estudiantes-seleccionados label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.estudiante-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #c41e3a;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    margin: 0 0.5rem 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.estudiante-chip button {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.estudiante-chip button:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.sin-compañeros {
+    text-align: center;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    color: #888;
+}
+
+.sin-compañeros span {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+.sin-compañeros p {
+    margin: 0;
+}
+
+/* Acciones */
+.formulario-acciones {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+    border-radius: 0 0 16px 16px;
+}
+
+.btn-anterior,
+.btn-siguiente,
+.btn-enviar {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-anterior {
+    background: white;
+    border: 2px solid #e0e0e0;
+    color: #666;
+}
+
+.btn-anterior:hover {
+    border-color: #c41e3a;
+    color: #c41e3a;
+}
+
+.btn-siguiente {
+    background: #c41e3a;
+    border: none;
+    color: white;
+    margin-left: auto;
+}
+
+.btn-siguiente:hover:not(:disabled) {
+    background: #a01830;
+}
+
+.btn-siguiente:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-enviar {
+    background: linear-gradient(135deg, #2e7d32, #388e3c);
+    border: none;
+    color: white;
+    margin-left: auto;
+}
+
+.btn-enviar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+}
+
+.btn-enviar:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .formulario-modal {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .formulario-header,
+    .formulario-paso {
+        padding: 1.5rem;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+    }
+    
+    .formulario-acciones {
+        padding: 1rem 1.5rem;
+    }
+}

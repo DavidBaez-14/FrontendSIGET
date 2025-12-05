@@ -1,0 +1,143 @@
+.navbar {
+    background: linear-gradient(135deg, #ef042b 0%, #db1335 100%);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 70px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar-logo {
+    height: 50px;
+    width: auto;
+    border-radius: 50%;
+    background: white;
+    padding: 3px;
+}
+
+.navbar-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.title-main {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.title-sub {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+}
+
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+}
+
+.navbar-item {
+    margin: 0;
+}
+
+.navbar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.navbar-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.navbar-item.active .navbar-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 600;
+}
+
+.navbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: white;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.navbar-user:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.user-icon {
+    font-size: 1.25rem;
+}
+
+.user-icon-svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .navbar-menu {
+        display: none;
+    }
+    
+    .navbar-container {
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar-title {
+        display: none;
+    }
+    
+    .user-name {
+        display: none;
+    }
+}

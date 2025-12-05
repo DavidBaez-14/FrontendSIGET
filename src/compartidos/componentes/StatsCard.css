@@ -1,0 +1,84 @@
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stats-title {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.stats-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1;
+}
+
+.stats-icon {
+    font-size: 2rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    background: #f5f5f5;
+}
+
+/* Color variants */
+.stats-card--primary .stats-icon {
+    background: rgba(196, 30, 58, 0.1);
+}
+
+.stats-card--warning .stats-icon {
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.stats-card--success .stats-icon {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.stats-card--info .stats-icon {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.stats-card--primary .stats-value {
+    color: #c41e3a;
+}
+
+.stats-card--warning .stats-value {
+    color: #f57c00;
+}
+
+.stats-card--success .stats-value {
+    color: #388e3c;
+}
+
+.stats-card--info .stats-value {
+    color: #1976d2;
+}
+
+/* Custom color (usando CSS variables) */
+.stats-card--custom .stats-icon {
+    background: var(--stats-bg, rgba(102, 126, 234, 0.1));
+}
+
+.stats-card--custom .stats-value {
+    color: var(--stats-color, #667eea);
+}

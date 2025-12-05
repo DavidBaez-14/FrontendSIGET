@@ -1,0 +1,133 @@
+.acciones-proyecto {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.btn-accion {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.btn-accion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-accion:active {
+    transform: translateY(0);
+}
+
+/* Tooltip en hover */
+.btn-accion::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d3748;
+    color: white;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    margin-bottom: 6px;
+    z-index: 10;
+}
+
+.btn-accion::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #2d3748;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    margin-bottom: -4px;
+    z-index: 10;
+}
+
+.btn-accion:hover::after,
+.btn-accion:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+/* Botón Cambiar Estado - Admin */
+.btn-estado {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-estado:hover {
+    background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+}
+
+/* Botón Agendar Reunión - Director y Estudiante */
+.btn-reunion {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.btn-reunion:hover {
+    background: linear-gradient(135deg, #0f8a7f 0%, #32d970 100%);
+}
+
+/* Botón Historial - Todos */
+.btn-historial {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-historial:hover {
+    background: linear-gradient(135deg, #e07aeb 0%, #e84a5e 100%);
+}
+
+/* Botón Ver Detalle - Director y Estudiante */
+.btn-detalle {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.btn-detalle:hover {
+    background: linear-gradient(135deg, #3d9aeb 0%, #00d9e5 100%);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .acciones-proyecto {
+        justify-content: center;
+    }
+    
+    .btn-accion {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .btn-icon {
+        font-size: 1rem;
+    }
+}

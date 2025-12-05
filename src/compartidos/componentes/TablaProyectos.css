@@ -1,0 +1,268 @@
+.tabla-proyectos-container {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tabla-proyectos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.tabla-proyectos thead {
+    background: linear-gradient(135deg, #ef042b 0%, #b90321 100%);
+    color: white;
+}
+
+.tabla-proyectos th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.tabla-proyectos th:first-child {
+    border-radius: 12px 0 0 0;
+}
+
+.tabla-proyectos th:last-child {
+    border-radius: 0 12px 0 0;
+}
+
+.tabla-proyectos tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.tabla-proyectos tbody tr:hover {
+    background-color: #fef7f8;
+}
+
+.tabla-proyectos tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tabla-proyectos td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+/* Columnas específicas */
+.td-titulo {
+    max-width: 250px;
+}
+
+.proyecto-titulo {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.td-estudiantes {
+    max-width: 180px;
+    color: #4a5568;
+}
+
+.td-director {
+    color: #4a5568;
+}
+
+.td-fecha {
+    white-space: nowrap;
+    color: #718096;
+}
+
+/* Badge de Estado */
+.estado-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.estado-propuesta {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+
+.estado-en-desarrollo,
+.estado-en-progreso {
+    background-color: #bee3f8;
+    color: #2b6cb0;
+}
+
+.estado-en-revision {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.estado-aprobado {
+    background-color: #c6f6d5;
+    color: #276749;
+}
+
+.estado-rechazado {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.estado-completado,
+.estado-finalizado {
+    background-color: #c4f1f9;
+    color: #086f83;
+}
+
+.estado-cancelado {
+    background-color: #e2e8f0;
+    color: #718096;
+}
+
+/* Badge de Programa */
+.programa-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.td-programa {
+    white-space: nowrap;
+}
+
+/* Badge de Fase */
+.fase-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.fase-formulacion {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+
+.fase-evaluacion {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.fase-aprobacion {
+    background-color: #c6f6d5;
+    color: #276749;
+}
+
+.fase-ejecucion {
+    background-color: #bee3f8;
+    color: #2b6cb0;
+}
+
+.fase-cierre {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.fase-finalizacion {
+    background-color: #c4f1f9;
+    color: #086f83;
+}
+
+.fase-default {
+    background-color: #f0f0f0;
+    color: #718096;
+}
+
+.td-fase {
+    white-space: nowrap;
+}
+
+/* Columna de acciones */
+.td-acciones {
+    min-width: 200px;
+}
+
+/* Estados de carga y vacío */
+.tabla-loading,
+.tabla-vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ef042b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.tabla-loading p,
+.tabla-vacia p {
+    margin-top: 1rem;
+    color: #718096;
+}
+
+.tabla-vacia-icon {
+    font-size: 3rem;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .tabla-proyectos {
+        font-size: 0.85rem;
+    }
+    
+    .tabla-proyectos th,
+    .tabla-proyectos td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .td-titulo {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 768px) {
+    .tabla-proyectos-container {
+        border-radius: 8px;
+    }
+    
+    .tabla-proyectos th:first-child {
+        border-radius: 8px 0 0 0;
+    }
+    
+    .tabla-proyectos th:last-child {
+        border-radius: 0 8px 0 0;
+    }
+}
