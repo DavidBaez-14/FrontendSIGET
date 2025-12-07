@@ -4,7 +4,7 @@ import TablaProyectos from '../compartidos/componentes/TablaProyectos';
 import StatsCard from '../compartidos/componentes/StatsCard';
 import ProyectoCard from '../proyectos/componentes/ProyectoCard';
 import * as api from '../services/api';
-import { historialService } from '../services/api';
+import { historialService, notificacionesService } from '../services/api';
 import './DashboardUnificado.css';
 
 // Mapeo de códigos de programa a nombres (según programas.sql)
@@ -75,6 +75,9 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
     const [modalAgregarCompanero, setModalAgregarCompanero] = useState(false);
     const [busquedaCompanero, setBusquedaCompanero] = useState('');
     const [companeroSeleccionado, setCompaneroSeleccionado] = useState(null);
+    const [buscandoCompanero, setBuscandoCompanero] = useState(false);
+    const [enviandoInvitacion, setEnviandoInvitacion] = useState(false);
+    const [errorBusqueda, setErrorBusqueda] = useState(null);
 
     useEffect(() => {
         cargarDatos();
@@ -179,6 +182,65 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
         setHistorialAbierto(false);
         setHistorial([]);
         setProyectoParaHistorial(null);
+    };
+
+    // Funciones para buscar e invitar compañeros
+    const handleBuscarCompanero = async () => {
+        if (!busquedaCompanero || busquedaCompanero.length < 4) {
+            setErrorBusqueda('Ingrese el código estudiantil completo (mínimo 4 dígitos)');
+            setCompaneroSeleccionado(null);
+            return;
+        }
+
+        setBuscandoCompanero(true);
+        setErrorBusqueda(null);
+        setCompaneroSeleccionado(null);
+
+        try {
+            const resultado = await notificacionesService.buscarEstudiantePorCodigo(busquedaCompanero);
+            setCompaneroSeleccionado(resultado);
+        } catch (err) {
+            setErrorBusqueda(err.response?.data?.message || err.message || 'No se encontró el estudiante');
+        } finally {
+            setBuscandoCompanero(false);
+        }
+    };
+
+    const handleInvitarCompanero = async () => {
+        if (!companeroSeleccionado || proyectos.length === 0) return;
+
+        setEnviandoInvitacion(true);
+
+        try {
+            const proyectoActual = proyectos[0]; // El estudiante solo tiene un proyecto activo
+            
+            await notificacionesService.enviarInvitacion({
+                proyectoId: proyectoActual.id,
+                estudianteInvitadoCedula: companeroSeleccionado.cedula,
+                invitanteCedula: usuario.cedula,
+                invitanteNombre: usuario.nombre,
+                tituloProyecto: proyectoActual.titulo
+            });
+
+            alert(`✅ Invitación enviada exitosamente a ${companeroSeleccionado.nombre}`);
+            
+            // Cerrar modal y resetear estados
+            setModalAgregarCompanero(false);
+            setBusquedaCompanero('');
+            setCompaneroSeleccionado(null);
+            setErrorBusqueda(null);
+        } catch (err) {
+            alert('❌ Error al enviar invitación: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setEnviandoInvitacion(false);
+        }
+    };
+
+    const resetearModalCompanero = () => {
+        setModalAgregarCompanero(false);
+        setBusquedaCompanero('');
+        setCompaneroSeleccionado(null);
+        setErrorBusqueda(null);
     };
 
     // Funciones auxiliares de estilo
@@ -825,61 +887,72 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
 
             {/* Modal de Agregar Compañero */}
             {modalAgregarCompanero && (
-                <div className="modal-overlay" onClick={() => setModalAgregarCompanero(false)}>
+                <div className="modal-overlay" onClick={resetearModalCompanero}>
                     <div className="modal-content modal-agregar-companero" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>👥 Agregar Compañero de Equipo</h2>
-                            <button className="modal-close" onClick={() => setModalAgregarCompanero(false)}>×</button>
+                            <button className="modal-close" onClick={resetearModalCompanero}>×</button>
                         </div>
                         <div className="modal-body">
                             <p className="modal-descripcion">
-                                Busca a tu compañero por nombre o código estudiantil para agregarlo al proyecto.
+                                Ingresa el código estudiantil para invitar a tu compañero a tu proyecto de grado.
                             </p>
                             
                             <div className="busqueda-companero">
                                 <div className="form-group">
-                                    <label>Buscar estudiante</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Nombre o código del estudiante..."
-                                        value={busquedaCompanero}
-                                        onChange={(e) => setBusquedaCompanero(e.target.value)}
-                                        className="input-busqueda"
-                                    />
+                                    <label>Código estudiantil</label>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            type="text"
+                                            placeholder="Ej: 1151555"
+                                            value={busquedaCompanero}
+                                            onChange={(e) => {
+                                                setBusquedaCompanero(e.target.value);
+                                                setErrorBusqueda(null);
+                                                setCompaneroSeleccionado(null);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && !buscandoCompanero) {
+                                                    handleBuscarCompanero();
+                                                }
+                                            }}
+                                            className="input-busqueda"
+                                            disabled={buscandoCompanero}
+                                        />
+                                        <button 
+                                            className="btn-buscar"
+                                            onClick={handleBuscarCompanero}
+                                            disabled={buscandoCompanero || !busquedaCompanero}
+                                        >
+                                            {buscandoCompanero ? '🔍 Buscando...' : '🔍 Buscar'}
+                                        </button>
+                                    </div>
                                 </div>
                                 
-                                {/* Resultados de búsqueda simulados */}
-                                {busquedaCompanero.length >= 2 && (
-                                    <div className="resultados-busqueda">
-                                        <div 
-                                            className={`resultado-item ${companeroSeleccionado?.codigo === '1151234' ? 'seleccionado' : ''}`}
-                                            onClick={() => setCompaneroSeleccionado({ nombre: 'María García López', codigo: '1151234' })}
-                                        >
-                                            <div className="resultado-avatar">MG</div>
-                                            <div className="resultado-info">
-                                                <span className="resultado-nombre">María García López</span>
-                                                <span className="resultado-codigo">Código: 1151234</span>
-                                            </div>
-                                            {companeroSeleccionado?.codigo === '1151234' && <span className="check-seleccion">✓</span>}
-                                        </div>
-                                        <div 
-                                            className={`resultado-item ${companeroSeleccionado?.codigo === '1155678' ? 'seleccionado' : ''}`}
-                                            onClick={() => setCompaneroSeleccionado({ nombre: 'Carlos Pérez Ruiz', codigo: '1155678' })}
-                                        >
-                                            <div className="resultado-avatar">CP</div>
-                                            <div className="resultado-info">
-                                                <span className="resultado-nombre">Carlos Pérez Ruiz</span>
-                                                <span className="resultado-codigo">Código: 1155678</span>
-                                            </div>
-                                            {companeroSeleccionado?.codigo === '1155678' && <span className="check-seleccion">✓</span>}
-                                        </div>
+                                {/* Errores de búsqueda */}
+                                {errorBusqueda && (
+                                    <div className="error-busqueda">
+                                        ⚠️ {errorBusqueda}
                                     </div>
                                 )}
                                 
+                                {/* Resultado de búsqueda */}
                                 {companeroSeleccionado && (
-                                    <div className="companero-seleccionado-preview">
-                                        <span>Seleccionado:</span>
-                                        <strong>{companeroSeleccionado.nombre}</strong>
+                                    <div className="resultados-busqueda">
+                                        <div className="resultado-item seleccionado">
+                                            <div className="resultado-avatar">
+                                                {companeroSeleccionado.nombre ? 
+                                                    companeroSeleccionado.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() 
+                                                    : '??'}
+                                            </div>
+                                            <div className="resultado-info">
+                                                <span className="resultado-nombre">{companeroSeleccionado.nombre || 'Nombre no disponible'}</span>
+                                                <span className="resultado-codigo">Cédula: {companeroSeleccionado.cedula}</span>
+                                                <span className="resultado-codigo">Código: {companeroSeleccionado.codigo}</span>
+                                                <span className="resultado-codigo">Programa: {PROGRAMAS[companeroSeleccionado.programaId] || companeroSeleccionado.programaId}</span>
+                                            </div>
+                                            <span className="check-seleccion">✓</span>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -892,25 +965,17 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
                         <div className="modal-footer">
                             <button 
                                 className="btn-cancelar" 
-                                onClick={() => {
-                                    setModalAgregarCompanero(false);
-                                    setBusquedaCompanero('');
-                                    setCompaneroSeleccionado(null);
-                                }}
+                                onClick={resetearModalCompanero}
+                                disabled={enviandoInvitacion}
                             >
                                 Cancelar
                             </button>
                             <button 
                                 className="btn-confirmar"
-                                disabled={!companeroSeleccionado}
-                                onClick={() => {
-                                    setModalProximamente({ abierto: true, tipo: 'companero' });
-                                    setModalAgregarCompanero(false);
-                                    setBusquedaCompanero('');
-                                    setCompaneroSeleccionado(null);
-                                }}
+                                disabled={!companeroSeleccionado || enviandoInvitacion}
+                                onClick={handleInvitarCompanero}
                             >
-                                Enviar Invitación
+                                {enviandoInvitacion ? '📨 Enviando...' : '📨 Enviar Invitación'}
                             </button>
                         </div>
                     </div>

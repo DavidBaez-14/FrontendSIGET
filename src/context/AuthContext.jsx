@@ -48,6 +48,14 @@ const USUARIOS_PRUEBA = {
         esAdminGeneral: false,
         comiteNombre: null,
         programaCodigo: '115'
+    },
+    ESTUDIANTE2: {
+        cedula: '1000055555',  // Estudiante SIN proyecto (para probar invitaciones)
+        nombre: 'Laura Martínez',
+        rol: 'ESTUDIANTE',
+        esAdminGeneral: false,
+        comiteNombre: null,
+        programaCodigo: '115'
     }
 };
 

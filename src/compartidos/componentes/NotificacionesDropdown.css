@@ -1,0 +1,225 @@
+.notificaciones-container {
+    position: relative;
+}
+
+.notificaciones-btn {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    color: #4a5568;
+}
+
+.notificaciones-btn:hover {
+    background-color: #f7fafc;
+}
+
+.notificaciones-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ef042b;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.notificaciones-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+}
+
+.notificaciones-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 380px;
+    max-height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+.notificaciones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.notificaciones-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+.notificaciones-contador {
+    background: #ef042b;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.notificaciones-lista {
+    overflow-y: auto;
+    max-height: 420px;
+}
+
+.notificaciones-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: #a0aec0;
+}
+
+.notificaciones-vacio p {
+    margin: 12px 0 0 0;
+    font-size: 0.95rem;
+}
+
+.notificacion-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f7fafc;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.notificacion-item:hover {
+    background-color: #f7fafc;
+}
+
+.notificacion-item:last-child {
+    border-bottom: none;
+}
+
+.notificacion-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7fafc;
+    border-radius: 50%;
+}
+
+.invitacion-icon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.notificacion-contenido {
+    flex: 1;
+    min-width: 0;
+}
+
+.notificacion-titulo {
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.notificacion-proyecto {
+    margin: 0 0 6px 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #667eea;
+}
+
+.notificacion-mensaje {
+    margin: 0 0 6px 0;
+    font-size: 0.85rem;
+    color: #4a5568;
+    line-height: 1.4;
+}
+
+.notificacion-fecha {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+.invitacion-item {
+    border-left: 3px solid #667eea;
+    cursor: default;
+}
+
+.invitacion-item:hover {
+    background-color: #faf5ff;
+}
+
+.invitacion-acciones {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.btn-aceptar,
+.btn-rechazar {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-aceptar {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-aceptar:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-rechazar {
+    background: #f7fafc;
+    color: #718096;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-rechazar:hover:not(:disabled) {
+    background: #edf2f7;
+}
+
+.btn-aceptar:disabled,
+.btn-rechazar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .notificaciones-dropdown {
+        width: calc(100vw - 32px);
+        right: -16px;
+    }
+}

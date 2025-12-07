@@ -181,6 +181,90 @@ export const historialService = {
     }
 };
 
+export const notificacionesService = {
+    async obtenerNotificaciones(cedula) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/usuario/${cedula}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener notificaciones');
+        }
+        return response.json();
+    },
+
+    async obtenerNotificacionesPendientes(cedula) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/usuario/${cedula}/pendientes`);
+        if (!response.ok) {
+            throw new Error('Error al obtener notificaciones pendientes');
+        }
+        return response.json();
+    },
+
+    async contarNotificacionesNoLeidas(cedula) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/usuario/${cedula}/contador`);
+        if (!response.ok) {
+            throw new Error('Error al contar notificaciones');
+        }
+        return response.json();
+    },
+
+    async enviarInvitacion(invitacionData) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/invitar-companero`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(invitacionData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al enviar invitación');
+        }
+        return response.json();
+    },
+
+    async responderInvitacion(notificacionId, respuesta) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/${notificacionId}/responder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ respuesta }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al responder invitación');
+        }
+        return response.json();
+    },
+
+    async marcarComoLeida(notificacionId) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/${notificacionId}/marcar-leida`, {
+            method: 'PATCH',
+        });
+        if (!response.ok) {
+            throw new Error('Error al marcar notificación como leída');
+        }
+        return response.json();
+    },
+
+    async buscarEstudiante(cedula) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/buscar-estudiante/${cedula}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al buscar estudiante');
+        }
+        return response.json();
+    },
+
+    async buscarEstudiantePorCodigo(codigo) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/buscar-estudiante-codigo/${codigo}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al buscar estudiante');
+        }
+        return response.json();
+    }
+};
+
 // Exports directos para facilitar el uso
 export const obtenerProyectosPorDirector = (cedula) => proyectosService.obtenerProyectosPorDirector(cedula);
 export const obtenerProyectosPorEstudiante = (cedula) => proyectosService.obtenerProyectoPorEstudiante(cedula);

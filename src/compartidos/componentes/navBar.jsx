@@ -1,4 +1,5 @@
 import { LayoutDashboard, FolderKanban, Users, Calendar, FileText, User } from 'lucide-react';
+import NotificacionesDropdown from './NotificacionesDropdown';
 import './NavBar.css';
 import logoUfps from '../../assets/logo_tesis_ufps.png';
 
@@ -60,9 +61,14 @@ function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'D
                     })}
                 </ul>
 
-                <div className="navbar-user">
-                    <User className="user-icon-svg" size={18} strokeWidth={2} />
-                    <span className="user-name">{nombreUsuario.split(' ').slice(0, 2).join(' ')}</span>
+                <div className="navbar-actions">
+                    {/* Notificaciones solo para estudiantes */}
+                    {rol === 'ESTUDIANTE' && <NotificacionesDropdown />}
+                    
+                    <div className="navbar-user">
+                        <User className="user-icon-svg" size={18} strokeWidth={2} />
+                        <span className="user-name">{nombreUsuario.split(' ').slice(0, 2).join(' ')}</span>
+                    </div>
                 </div>
             </div>
         </nav>

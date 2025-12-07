@@ -89,6 +89,12 @@
     color: currentColor;
 }
 
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 .navbar-user {
     display: flex;
     align-items: center;

@@ -39,9 +39,16 @@ function SelectorUsuarios() {
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('ESTUDIANTE')}
-          title="Estudiante"
+          title="Estudiante (con proyecto)"
         >
           👨‍🎓
+        </button>
+        <button 
+          className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE2.cedula ? 'active' : ''}`}
+          onClick={() => cambiarUsuario('ESTUDIANTE2')}
+          title="Estudiante 2 (sin proyecto)"
+        >
+          👩‍🎓
         </button>
       </div>
     </div>
