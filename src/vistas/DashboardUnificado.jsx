@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import TablaProyectos from '../compartidos/componentes/TablaProyectos';
 import StatsCard from '../compartidos/componentes/StatsCard';
 import ProyectoCard from '../proyectos/componentes/ProyectoCard';
+import FormularioProyectoSimple from '../proyectos/componentes/FormularioProyectoSimple';
+import ModalSolicitarDirector from '../compartidos/componentes/ModalSolicitarDirector';
 import * as api from '../services/api';
 import { historialService, notificacionesService } from '../services/api';
 import './DashboardUnificado.css';
@@ -79,6 +81,15 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
     const [enviandoInvitacion, setEnviandoInvitacion] = useState(false);
     const [errorBusqueda, setErrorBusqueda] = useState(null);
 
+    // Estado para modal de crear proyecto
+    const [modalCrearProyecto, setModalCrearProyecto] = useState(false);
+
+    // Estado para modal de solicitar director
+    const [modalSolicitarDirector, setModalSolicitarDirector] = useState(false);
+    
+    // Estado para invitación pendiente de director
+    const [invitacionDirectorPendiente, setInvitacionDirectorPendiente] = useState(null);
+
     useEffect(() => {
         cargarDatos();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,6 +133,12 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
     const cargarDatosEstudiante = async () => {
         const data = await api.obtenerProyectosPorEstudiante(usuario.cedula);
         setProyectos(Array.isArray(data) ? data : [data].filter(Boolean));
+        
+        // Cargar invitación pendiente si hay proyecto
+        if (data && !Array.isArray(data)) {
+            const invitacion = await notificacionesService.obtenerInvitacionPendienteProyecto(data.id, usuario.cedula);
+            setInvitacionDirectorPendiente(invitacion || null);
+        }
     };
 
     // Funciones para modal de cambio de estado
@@ -243,6 +260,23 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
         setErrorBusqueda(null);
     };
 
+    // Función para cuando se crea un proyecto
+    const handleProyectoCreado = (nuevoProyecto) => {
+        setProyectos([nuevoProyecto]);
+        setModalCrearProyecto(false);
+        alert('✅ ¡Proyecto creado exitosamente! Ahora puedes invitar compañeros y solicitar un director.');
+    };
+    
+    // Función para cuando se envía invitación a director
+    const handleDirectorInvitado = async () => {
+        // Recargar datos para obtener la invitación pendiente
+        if (esEstudiante && proyectos.length === 1) {
+            const proyecto = proyectos[0];
+            const invitacion = await notificacionesService.obtenerInvitacionPendienteProyecto(proyecto.id, usuario.cedula);
+            setInvitacionDirectorPendiente(invitacion || null);
+        }
+    };
+
     // Funciones auxiliares de estilo
     const getEstadoClass = (estado) => {
         const clases = {
@@ -301,6 +335,23 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
 
     const cerrarModalProximamente = () => {
         setModalProximamente({ abierto: false, tipo: '' });
+    };
+    
+    // Función para cancelar invitación a director
+    const handleCancelarInvitacionDirector = async () => {
+        if (!invitacionDirectorPendiente) return;
+        
+        if (!window.confirm('¿Estás seguro de cancelar esta invitación? Podrás enviar una nueva invitación después.')) {
+            return;
+        }
+        
+        try {
+            await notificacionesService.cancelarInvitacionDirector(invitacionDirectorPendiente.id);
+            setInvitacionDirectorPendiente(null);
+            alert('✓ Invitación cancelada correctamente');
+        } catch (error) {
+            alert('Error al cancelar invitación: ' + error.message);
+        }
     };
 
     const accionesCallbacks = {
@@ -425,7 +476,7 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
                         <p>Inicia tu proceso de grado registrando tu propuesta de proyecto</p>
                         <button 
                             className="btn-crear-proyecto"
-                            onClick={() => setModalProximamente({ abierto: true, tipo: 'crearProyecto' })}
+                            onClick={() => setModalCrearProyecto(true)}
                         >
                             <span>➕</span> Registrar Proyecto
                         </button>
@@ -435,17 +486,17 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
                         <div className="info-card">
                             <span className="info-card-icon">📋</span>
                             <h3>Requisitos</h3>
-                            <p>Debes tener definido el título, objetivo y director para tu propuesta</p>
+                            <p>Define el título, descripción, objetivo general, modalidad y línea de investigación</p>
                         </div>
                         <div className="info-card">
                             <span className="info-card-icon">👥</span>
                             <h3>Compañeros</h3>
-                            <p>Puedes agregar hasta 2 compañeros a tu proyecto</p>
+                            <p>Después podrás invitar hasta 2 compañeros a tu proyecto</p>
                         </div>
                         <div className="info-card">
-                            <span className="info-card-icon">📅</span>
-                            <h3>Proceso</h3>
-                            <p>Una vez registrado, será evaluado por el comité curricular</p>
+                            <span className="info-card-icon">👨‍🏫</span>
+                            <h3>Director</h3>
+                            <p>Más adelante podrás solicitar un director para tu proyecto</p>
                         </div>
                     </div>
                 </div>
@@ -467,6 +518,71 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
                             onAgendarReunion={() => handleAgendarReunion(proyecto)}
                             esEstudiante={true}
                         />
+                        
+                        {/* Sección de Director */}
+                        <div className="director-card">
+                            <div className="director-header">
+                                <h3>🎓 Director del Proyecto</h3>
+                            </div>
+                            
+                            {!proyecto.directorNombre ? (
+                                invitacionDirectorPendiente ? (
+                                    // Mostrar invitación pendiente con botón cancelar
+                                    <div className="director-invitacion-pendiente">
+                                        <div className="invitacion-pendiente-icono">⏳</div>
+                                        <div className="invitacion-pendiente-contenido">
+                                            <p className="invitacion-pendiente-titulo">
+                                                Invitación Enviada
+                                            </p>
+                                            <p className="invitacion-pendiente-texto">
+                                                Has enviado una invitación a <strong>{invitacionDirectorPendiente.metadata?.directorNombre || 'un director'}</strong>
+                                            </p>
+                                            <p className="invitacion-pendiente-nota">
+                                                💡 Espera su respuesta o cancela si deseas invitar a otro director
+                                            </p>
+                                        </div>
+                                        <button 
+                                            className="btn-cancelar-invitacion-director"
+                                            onClick={handleCancelarInvitacionDirector}
+                                            title="Cancelar invitación"
+                                        >
+                                            <span>✕ Cancelar Invitación</span>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    // Sin director y sin invitación pendiente
+                                    <div className="director-sin-asignar">
+                                        <div className="director-sin-asignar-icono">🔍</div>
+                                        <p className="director-sin-asignar-texto">
+                                            Aún no tienes un director asignado
+                                        </p>
+                                        <button 
+                                            className="btn-solicitar-director"
+                                            onClick={() => setModalSolicitarDirector(true)}
+                                        >
+                                            <span>📨 Solicitar Director</span>
+                                        </button>
+                                        <p className="director-sin-asignar-nota">
+                                            💡 Busca un profesor o director externo para que dirija tu proyecto
+                                        </p>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="director-asignado">
+                                    <div className="director-asignado-avatar">
+                                        {proyecto.directorNombre.charAt(0)}
+                                    </div>
+                                    <div className="director-asignado-info">
+                                        <span className="director-asignado-nombre">
+                                            {proyecto.directorNombre}
+                                        </span>
+                                        <span className="director-asignado-tipo">
+                                            {proyecto.tipoDirector === 'PROFESOR' ? '👨‍🏫 Profesor' : '🎯 Director Externo'}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         
                         {/* Sección de Equipo de Trabajo */}
                         <div className="equipo-trabajo-card">
@@ -980,6 +1096,25 @@ function DashboardUnificado({ vistaActiva = 'dashboard' }) {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Modal Crear Proyecto */}
+            {modalCrearProyecto && (
+                <FormularioProyectoSimple
+                    cedulaEstudiante={usuario.cedula}
+                    onClose={() => setModalCrearProyecto(false)}
+                    onProyectoCreado={handleProyectoCreado}
+                />
+            )}
+
+            {/* Modal Solicitar Director */}
+            {modalSolicitarDirector && proyectos.length > 0 && (
+                <ModalSolicitarDirector
+                    proyecto={proyectos[0]}
+                    usuario={usuario}
+                    onCerrar={() => setModalSolicitarDirector(false)}
+                    onDirectorInvitado={handleDirectorInvitado}
+                />
             )}
         </div>
     );

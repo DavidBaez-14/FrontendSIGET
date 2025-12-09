@@ -62,8 +62,8 @@ function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'D
                 </ul>
 
                 <div className="navbar-actions">
-                    {/* Notificaciones solo para estudiantes */}
-                    {rol === 'ESTUDIANTE' && <NotificacionesDropdown />}
+                    {/* Notificaciones para estudiantes y directores */}
+                    {(rol === 'ESTUDIANTE' || rol === 'DIRECTOR') && <NotificacionesDropdown />}
                     
                     <div className="navbar-user">
                         <User className="user-icon-svg" size={18} strokeWidth={2} />

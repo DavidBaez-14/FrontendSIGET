@@ -56,6 +56,14 @@ const USUARIOS_PRUEBA = {
         esAdminGeneral: false,
         comiteNombre: null,
         programaCodigo: '115'
+    },
+    ESTUDIANTE3: {
+        cedula: '1000077777',  // Estudiante SIN proyecto (para crear nuevo proyecto)
+        nombre: 'Kevin Arias',
+        rol: 'ESTUDIANTE',
+        esAdminGeneral: false,
+        comiteNombre: null,
+        programaCodigo: '115'
     }
 };
 

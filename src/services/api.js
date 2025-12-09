@@ -70,9 +70,17 @@ export const proyectosService = {
 
 export const catalogosService = {
     async obtenerModalidades() {
-        const response = await fetch(`${API_BASE_URL}/catalogos/modalidades`);
+        const response = await fetch(`${API_BASE_URL}/modalidades`);
         if (!response.ok) {
             throw new Error('Error al obtener modalidades');
+        }
+        return response.json();
+    },
+
+    async obtenerLineasInvestigacion() {
+        const response = await fetch(`${API_BASE_URL}/lineas-investigacion`);
+        if (!response.ok) {
+            throw new Error('Error al obtener líneas de investigación');
         }
         return response.json();
     },
@@ -262,6 +270,94 @@ export const notificacionesService = {
             throw new Error(errorData.message || 'Error al buscar estudiante');
         }
         return response.json();
+    },
+
+    // ========================================
+    // ENDPOINTS PARA DIRECTORES
+    // ========================================
+
+    async buscarDirectores(busqueda = '') {
+        const url = busqueda 
+            ? `${API_BASE_URL}/api/notificaciones/buscar-directores?busqueda=${encodeURIComponent(busqueda)}`
+            : `${API_BASE_URL}/api/notificaciones/listar-directores`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Error al buscar directores');
+        }
+        return response.json();
+    },
+
+    async listarTodosLosDirectores() {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/listar-directores`);
+        if (!response.ok) {
+            throw new Error('Error al listar directores');
+        }
+        return response.json();
+    },
+
+    async enviarInvitacionDirector(invitacionData) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/invitar-director`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(invitacionData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al enviar invitación al director');
+        }
+        return response.json();
+    },
+
+    async responderInvitacionDirector(notificacionId, respuesta) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/${notificacionId}/responder-direccion`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ respuesta }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al responder invitación de dirección');
+        }
+        return response.json();
+    },
+
+    async cancelarInvitacionDirector(notificacionId) {
+        const response = await fetch(`${API_BASE_URL}/api/notificaciones/${notificacionId}/cancelar-invitacion-director`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Error al cancelar invitación');
+        }
+        return response.json();
+    },
+
+    async obtenerInvitacionPendienteProyecto(proyectoId, cedulaEstudiante) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/notificaciones/proyecto/${proyectoId}/invitacion-pendiente`);
+            if (!response.ok) {
+                console.error('Error al obtener invitación pendiente:', response.status);
+                return null;
+            }
+            const data = await response.json();
+            
+            if (data.invitacion) {
+                console.log('✅ Invitación pendiente encontrada:', data.invitacion.metadata?.directorNombre);
+            } else {
+                console.log('ℹ️ No hay invitación pendiente para el proyecto', proyectoId);
+            }
+            return data.invitacion;
+        } catch (error) {
+            console.error('Error en obtenerInvitacionPendienteProyecto:', error);
+            return null;
+        }
     }
 };
 

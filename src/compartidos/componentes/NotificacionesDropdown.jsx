@@ -57,6 +57,32 @@ function NotificacionesDropdown() {
         }
     };
 
+    const handleAceptarInvitacionDireccion = async (notificacion) => {
+        setCargando(true);
+        try {
+            await notificacionesService.responderInvitacionDirector(notificacion.id, 'ACEPTADA');
+            await cargarNotificaciones();
+            // Recargar página para actualizar el proyecto
+            window.location.reload();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    const handleRechazarInvitacionDireccion = async (notificacion) => {
+        setCargando(true);
+        try {
+            await notificacionesService.responderInvitacionDirector(notificacion.id, 'RECHAZADA');
+            await cargarNotificaciones();
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            setCargando(false);
+        }
+    };
+
     const handleMarcarLeida = async (notificacion) => {
         try {
             await notificacionesService.marcarComoLeida(notificacion.id);
@@ -108,6 +134,14 @@ function NotificacionesDropdown() {
                                             notificacion={notif}
                                             onAceptar={() => handleAceptarInvitacion(notif)}
                                             onRechazar={() => handleRechazarInvitacion(notif)}
+                                            cargando={cargando}
+                                        />
+                                    ) : notif.tipo === 'INVITACION_DIRECCION' ? (
+                                        <InvitacionDireccionCard 
+                                            key={notif.id}
+                                            notificacion={notif}
+                                            onAceptar={() => handleAceptarInvitacionDireccion(notif)}
+                                            onRechazar={() => handleRechazarInvitacionDireccion(notif)}
                                             cargando={cargando}
                                         />
                                     ) : (
@@ -178,6 +212,37 @@ function NotificacionCard({ notificacion, onMarcarLeida }) {
                         minute: '2-digit'
                     })}
                 </span>
+            </div>
+        </div>
+    );
+}
+
+function InvitacionDireccionCard({ notificacion, onAceptar, onRechazar, cargando }) {
+    const metadata = notificacion.metadata || {};
+
+    return (
+        <div className="notificacion-item invitacion-item invitacion-direccion">
+            <div className="notificacion-icon invitacion-icon">🎓</div>
+            <div className="notificacion-contenido">
+                <h4 className="notificacion-titulo">{notificacion.titulo}</h4>
+                <p className="notificacion-proyecto">{metadata.tituloProyecto}</p>
+                <p className="notificacion-mensaje">{notificacion.mensaje}</p>
+                <div className="invitacion-acciones">
+                    <button 
+                        className="btn-aceptar" 
+                        onClick={onAceptar}
+                        disabled={cargando}
+                    >
+                        ✓ Aceptar
+                    </button>
+                    <button 
+                        className="btn-rechazar" 
+                        onClick={onRechazar}
+                        disabled={cargando}
+                    >
+                        ✕ Rechazar
+                    </button>
+                </div>
             </div>
         </div>
     );
