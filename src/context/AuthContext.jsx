@@ -1,78 +1,25 @@
 import { createContext, useContext, useState } from 'react';
+import axios from 'axios';
 
 /**
- * AuthContext - Contexto de autenticación para la aplicación
+ * AuthContext - Contexto de autenticación con backend real
  * 
- * Este componente proporciona un sistema de autenticación simulado para el MVP.
- * Permite cambiar entre diferentes tipos de usuarios (Admin, Director, Estudiante)
- * para probar las diferentes vistas y funcionalidades de la aplicación.
- * 
- * En producción, este contexto se conectaría con un backend real de autenticación.
+ * Maneja:
+ * - Login con cédula y contraseña
+ * - Logout
+ * - Persistencia de sesión en localStorage
+ * - Estado de autenticación
  * 
  * Uso:
  * - Envolver la app con <AuthProvider>
- * - Usar useAuth() en cualquier componente para acceder al usuario actual
- * - Usar cambiarUsuario('TIPO') para simular login con diferentes roles
+ * - Usar useAuth() en cualquier componente
  */
-
-// Usuarios de prueba - DEBEN COINCIDIR con datos reales de la BD
-const USUARIOS_PRUEBA = {
-    ADMIN_GENERAL: {
-        cedula: '4000000001',
-        nombre: 'Carlos René Angarita',
-        rol: 'ADMINISTRADOR',
-        esAdminGeneral: true,
-        comiteNombre: null,
-        programaCodigo: null
-    },
-    ADMIN_SISTEMAS: {
-        cedula: '4000000002',
-        nombre: 'Judith del Pilar Rodriguez Tenjo',
-        rol: 'ADMINISTRADOR',
-        esAdminGeneral: false,
-        comiteNombre: 'COM-SIST',
-        programaCodigo: '115'
-    },
-    DIRECTOR: {
-        cedula: '2000000760',
-        nombre: 'Marco Adarme',
-        rol: 'DIRECTOR',
-        esAdminGeneral: false,
-        comiteNombre: null,
-        programaCodigo: null
-    },
-    ESTUDIANTE: {
-        cedula: '1000033333',  // Estudiante con proyecto del director 2000000760
-        nombre: 'David Báez',
-        rol: 'ESTUDIANTE',
-        esAdminGeneral: false,
-        comiteNombre: null,
-        programaCodigo: '115'
-    },
-    ESTUDIANTE2: {
-        cedula: '1000055555',  // Estudiante SIN proyecto (para probar invitaciones)
-        nombre: 'Laura Martínez',
-        rol: 'ESTUDIANTE',
-        esAdminGeneral: false,
-        comiteNombre: null,
-        programaCodigo: '115'
-    },
-    ESTUDIANTE3: {
-        cedula: '1000077777',  // Estudiante SIN proyecto (para crear nuevo proyecto)
-        nombre: 'Kevin Arias',
-        rol: 'ESTUDIANTE',
-        esAdminGeneral: false,
-        comiteNombre: null,
-        programaCodigo: '115'
-    }
-};
 
 // Crear el contexto
 const AuthContext = createContext(null);
 
 /**
  * Hook personalizado para acceder al contexto de autenticación
- * @returns {Object} Objeto con usuario, funciones y helpers de autenticación
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
@@ -84,28 +31,82 @@ export const useAuth = () => {
 };
 
 /**
- * Provider de autenticación que envuelve la aplicación
+ * Provider de autenticación
  */
 export function AuthProvider({ children }) {
-    // Usuario inicial: Admin de Sistemas (para pruebas)
-    const [usuario, setUsuario] = useState(USUARIOS_PRUEBA.ADMIN_SISTEMAS);
+    // Lazy initialization - cargar usuario desde localStorage una vez
+    const [usuario, setUsuario] = useState(() => {
+        try {
+            const usuarioGuardado = localStorage.getItem('usuario');
+            if (usuarioGuardado) {
+                return JSON.parse(usuarioGuardado);
+            }
+        } catch (error) {
+            console.error('Error al cargar usuario:', error);
+            localStorage.removeItem('usuario');
+        }
+        return null;
+    });
+
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        try {
+            const usuarioGuardado = localStorage.getItem('usuario');
+            return usuarioGuardado !== null;
+        } catch {
+            return false;
+        }
+    });
+
+    // Loading siempre es false porque usamos lazy initialization (sin useEffect asíncrono)
+    const loading = false;
 
     /**
-     * Cambia el usuario activo (simula login)
-     * @param {string} tipoUsuario - ADMIN_GENERAL | ADMIN_SISTEMAS | DIRECTOR | ESTUDIANTE
+     * Login - Autentica usuario con el backend
      */
-    const cambiarUsuario = (tipoUsuario) => {
-        if (USUARIOS_PRUEBA[tipoUsuario]) {
-            setUsuario(USUARIOS_PRUEBA[tipoUsuario]);
+    const login = async (cedula, password) => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/auth/login', {
+                cedula,
+                password
+            });
+
+            const userData = {
+                cedula: response.data.cedula,
+                nombre: response.data.nombre,
+                email: response.data.email,
+                rol: response.data.rol,
+                esAdminGeneral: response.data.esAdminGeneral,
+                comiteNombre: response.data.comiteNombre,
+                programaCodigo: response.data.programaCodigo
+            };
+
+            setUsuario(userData);
+            setIsAuthenticated(true);
+            localStorage.setItem('usuario', JSON.stringify(userData));
+
+            return userData;
+        } catch (error) {
+            console.error('Error en login:', error);
+            const mensaje = error.response?.data?.error || 'Error al iniciar sesión';
+            throw new Error(mensaje);
         }
     };
 
     /**
+     * Logout - Cierra sesión del usuario
+     */
+    const logout = () => {
+        setUsuario(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('usuario');
+    };
+
+    /**
      * Verifica si el usuario actual tiene un permiso específico
-     * @param {string} permiso - Nombre del permiso a verificar
-     * @returns {boolean}
      */
     const tienePermiso = (permiso) => {
+        if (!usuario) return false;
+        
         const permisos = {
             ADMINISTRADOR: ['ver_todos_proyectos', 'cambiar_estado', 'ver_historial', 'ver_comites'],
             DIRECTOR: ['ver_mis_proyectos', 'agendar_reunion', 'ver_historial', 'ver_detalle'],
@@ -114,15 +115,17 @@ export function AuthProvider({ children }) {
         return permisos[usuario.rol]?.includes(permiso) || false;
     };
 
-    // Valor del contexto con toda la información necesaria
+    // Valor del contexto
     const value = {
-        usuario,                    // Usuario actual
-        cambiarUsuario,             // Función para cambiar usuario
-        tienePermiso,               // Función para verificar permisos
-        esAdmin: usuario.rol === 'ADMINISTRADOR',
-        esDirector: usuario.rol === 'DIRECTOR',
-        esEstudiante: usuario.rol === 'ESTUDIANTE',
-        usuariosPrueba: USUARIOS_PRUEBA  // Para el selector de usuarios de prueba
+        usuario,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        tienePermiso,
+        esAdmin: usuario?.rol === 'ADMINISTRADOR',
+        esDirector: usuario?.rol === 'DIRECTOR',
+        esEstudiante: usuario?.rol === 'ESTUDIANTE'
     };
 
     return (

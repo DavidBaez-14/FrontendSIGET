@@ -359,6 +359,103 @@ export const notificacionesService = {
     }
 };
 
+export const reunionesService = {
+    async solicitarReunion(reunionData) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/solicitar`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reunionData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Error al solicitar reunión');
+        }
+        return response.json();
+    },
+
+    async responderSolicitud(reunionId, respondenteCedula, respuestaData) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/${reunionId}/responder?respondenteCedula=${respondenteCedula}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(respuestaData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Error al responder solicitud');
+        }
+        return response.json();
+    },
+
+    async registrarDetalles(detallesData) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/registrar`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(detallesData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Error al registrar detalles');
+        }
+        return response.json();
+    },
+
+    async marcarAsistencia(reunionId, asistenciaData) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/${reunionId}/asistencia`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(asistenciaData),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Error al marcar asistencia');
+        }
+        return response.json();
+    },
+
+    async obtenerPorProyecto(proyectoId) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/proyecto/${proyectoId}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener reuniones del proyecto');
+        }
+        return response.json();
+    },
+
+    async obtenerPorDirector(cedulaDirector) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/director/${cedulaDirector}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener reuniones del director');
+        }
+        return response.json();
+    },
+
+    async obtenerPorEstudiante(cedulaEstudiante) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/estudiante/${cedulaEstudiante}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener reuniones del estudiante');
+        }
+        return response.json();
+    },
+
+    async cancelarReunion(reunionId, usuarioCedula) {
+        const response = await fetch(`${API_BASE_URL}/api/reuniones/${reunionId}/cancelar?usuarioCedula=${usuarioCedula}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Error al cancelar reunión');
+        }
+        return response.json();
+    }
+};
+
 // Exports directos para facilitar el uso
 export const obtenerProyectosDirector = (cedula) => proyectosService.obtenerProyectosDirector(cedula);
 export const obtenerProyectoEstudiante = (cedula) => proyectosService.obtenerProyectoEstudiante(cedula);

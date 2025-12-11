@@ -5,9 +5,8 @@ import './MainLayout.css';
 /**
  * Layout principal que envuelve todas las vistas
  * Incluye el NavBar con menú según el rol del usuario
- * @param {React.ReactNode} selectorUsuarios - Componente selector de usuarios para testing
  */
-function MainLayout({ children, menuActivo = 'Dashboard', onMenuClick, selectorUsuarios }) {
+function MainLayout({ children, menuActivo = 'Dashboard', onMenuClick }) {
     const { usuario } = useAuth();
 
     return (
@@ -21,13 +20,6 @@ function MainLayout({ children, menuActivo = 'Dashboard', onMenuClick, selectorU
             <main className="main-content">
                 {children}
             </main>
-            
-            {/* Panel de testing para cambiar de usuario */}
-            {selectorUsuarios && (
-                <div className="testing-panel">
-                    {selectorUsuarios}
-                </div>
-            )}
         </div>
     );
 }

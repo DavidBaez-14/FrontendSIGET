@@ -42,6 +42,53 @@
     font-size: 0.95rem;
 }
 
+/* Estilos para vista de reuniones */
+.reuniones-acciones {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-nueva-reunion {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-nueva-reunion:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-nueva-reunion:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reuniones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .reuniones-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .reuniones-acciones {
+        justify-content: center;
+    }
+}
+
 /* Admin Header específico */
 .admin-header .admin-info {
     display: flex;

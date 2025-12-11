@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProyectoCard from '../proyectos/componentes/ProyectoCard';
 import FormularioProyectoSimple from '../proyectos/componentes/FormularioProyectoSimple';
 import ModalSolicitarDirector from '../compartidos/componentes/ModalSolicitarDirector';
-import { notificacionesService } from '../services/api';
+import ModalSolicitarReunion from '../reuniones/ModalSolicitarReunion';
+import ReunionCard from '../reuniones/ReunionCard';
+import { notificacionesService, reunionesService } from '../services/api';
 import './DashboardUnificado.css';
 
 /**
@@ -19,15 +21,22 @@ function DashboardEstudiante({
     onProyectoCreado,
     onDirectorInvitado,
     onCancelarInvitacionDirector,
-    onAgendarReunion,
+    // onAgendarReunion, // Removido - DashboardEstudiante usa handleAbrirModalReunion local
     onVerHistorial,
     onVerDetalle,
-    onRecargarDatos
+    onRecargarDatos,
+    vistaActiva = 'dashboard'
 }) {
     // Estados para modales internos
     const [modalCrearProyecto, setModalCrearProyecto] = useState(false);
     const [modalSolicitarDirector, setModalSolicitarDirector] = useState(false);
     const [modalAgregarCompanero, setModalAgregarCompanero] = useState(false);
+    const [modalSolicitarReunion, setModalSolicitarReunion] = useState(false);
+    
+    // Estados para reuniones
+    const [reuniones, setReuniones] = useState([]);
+    const [cargandoReuniones, setCargandoReuniones] = useState(false);
+    const [receptorReunion, setReceptorReunion] = useState(null);
     
     // Estados para agregar compañero
     const [busquedaCompanero, setBusquedaCompanero] = useState('');
@@ -88,6 +97,59 @@ function DashboardEstudiante({
         setErrorBusqueda(null);
     };
 
+    const cargarReuniones = async () => {
+        console.log('🔄 Cargando reuniones para estudiante:', usuario.cedula);
+        setCargandoReuniones(true);
+        try {
+            const response = await reunionesService.obtenerPorEstudiante(usuario.cedula);
+            console.log('✅ Reuniones recibidas:', response);
+            console.log('📊 Cantidad de reuniones:', response.data?.length || 0);
+            setReuniones(response.data || []);
+        } catch (error) {
+            console.error('❌ Error al cargar reuniones:', error);
+            alert('Error al cargar reuniones: ' + error.message);
+        } finally {
+            setCargandoReuniones(false);
+        }
+    };
+
+    // Cargar reuniones cuando la vista es 'reuniones'
+    useEffect(() => {
+        if (vistaActiva === 'reuniones' && usuario?.cedula) {
+            cargarReuniones();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [vistaActiva, usuario]);
+
+    const handleAbrirModalReunion = (proyectoParam = null) => {
+        console.log('🔔 handleAbrirModalReunion llamado con proyecto:', proyectoParam);
+        // Usar el proyecto pasado como parámetro o el proyecto del estado
+        const proyectoActual = proyectoParam || proyecto;
+        
+        console.log('📋 Proyecto actual:', proyectoActual);
+        
+        if (!proyectoActual?.directorNombre) {
+            console.warn('⚠️ No hay director asignado');
+            alert('Necesitas tener un director asignado para solicitar reuniones');
+            return;
+        }
+        // Obtener cédula del director desde el proyecto
+        const directorCedula = proyectoActual.directorCedula || proyectoActual.directorProfesorCedula || proyectoActual.directorExternoCedula;
+        console.log('👨‍🏫 Director:', directorCedula, proyectoActual.directorNombre);
+        
+        setReceptorReunion({
+            cedula: directorCedula,
+            nombre: proyectoActual.directorNombre
+        });
+        setModalSolicitarReunion(true);
+        console.log('✅ Modal de reunión abierto');
+    };
+
+    const handleReunionSolicitada = () => {
+        setModalSolicitarReunion(false);
+        cargarReuniones();
+    };
+
     const handleProyectoCreado = (nuevoProyecto) => {
         setModalCrearProyecto(false);
         onProyectoCreado?.(nuevoProyecto);
@@ -115,6 +177,57 @@ function DashboardEstudiante({
                 <div className="error-container">
                     <p className="error-message">❌ {error}</p>
                 </div>
+            </div>
+        );
+    }
+
+    // Vista de REUNIONES
+    if (vistaActiva === 'reuniones') {
+        if (!proyecto) {
+            return (
+                <div className="dashboard-container">
+                    <div className="empty-state">
+                        <div className="empty-state-icon">📋</div>
+                        <h3>Necesitas un proyecto para gestionar reuniones</h3>
+                        <p>Primero crea tu proyecto de grado para poder solicitar reuniones con tu director.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <div className="dashboard-container">
+                <div className="dashboard-header">
+                    <h1>
+                        <span className="saludo">Mis Reuniones</span>
+                    </h1>
+                    <p className="subtitulo">Gestiona las reuniones con tu director</p>
+                </div>
+
+                {cargandoReuniones ? (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>Cargando reuniones...</p>
+                    </div>
+                ) : reuniones.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-state-icon">📅</div>
+                        <h3>No tienes reuniones programadas</h3>
+                        <p>Solicita una reunión con tu director para discutir el avance de tu proyecto.</p>
+                    </div>
+                ) : (
+                    <div className="reuniones-grid">
+                        {reuniones.map((reunion) => (
+                            <ReunionCard
+                                key={reunion.id}
+                                reunion={reunion}
+                                usuario={usuario}
+                                onReunionActualizada={cargarReuniones}
+                            />
+                        ))}
+                    </div>
+                )}
+
             </div>
         );
     }
@@ -173,7 +286,7 @@ function DashboardEstudiante({
                 <ProyectoCard
                     proyecto={proyecto}
                     esEstudiante={true}
-                    onAgendarReunion={onAgendarReunion}
+                    onAgendarReunion={handleAbrirModalReunion}
                     onVerHistorial={onVerHistorial}
                     onVerDetalle={onVerDetalle}
                 />
@@ -406,6 +519,18 @@ function DashboardEstudiante({
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Modal Solicitar Reunión - Disponible para todas las vistas */}
+            {modalSolicitarReunion && receptorReunion && proyecto && (
+                <ModalSolicitarReunion
+                    proyecto={proyecto}
+                    usuario={usuario}
+                    receptorCedula={receptorReunion.cedula}
+                    receptorNombre={receptorReunion.nombre}
+                    onCerrar={() => setModalSolicitarReunion(false)}
+                    onReunionSolicitada={handleReunionSolicitada}
+                />
             )}
         </div>
     );

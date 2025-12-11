@@ -2,68 +2,31 @@ import { useState } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import MainLayout from './compartidos/componentes/MainLayout'
 import DashboardUnificado from './vistas/DashboardUnificado'
+import LoginPage from './auth/LoginPage'
 import './App.css'
 
 /**
- * Selector de usuarios de prueba - Permite cambiar entre diferentes roles
- * para probar las diferentes vistas de la aplicación
+ * Componente principal de la aplicación
+ * Maneja la autenticación y el renderizado de vistas según el usuario
  */
-function SelectorUsuarios() {
-  const { usuario, cambiarUsuario, usuariosPrueba } = useAuth();
-
-  return (
-    <div className="usuario-selector-inline">
-      <span className="selector-title">🧪 Cambiar Usuario:</span>
-      <div className="selector-opciones">
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.ADMIN_GENERAL.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('ADMIN_GENERAL')}
-          title="Super Administrador General"
-        >
-          👑 Admin
-        </button>
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.ADMIN_SISTEMAS.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('ADMIN_SISTEMAS')}
-          title="Coordinador Comité Sistemas"
-        >
-          📋 Coord
-        </button>
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.DIRECTOR.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('DIRECTOR')}
-          title="Director de Tesis"
-        >
-          👨‍🏫 Director
-        </button>
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('ESTUDIANTE')}
-          title="Estudiante (con proyecto)"
-        >
-          👨‍🎓 Est1
-        </button>
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE2.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('ESTUDIANTE2')}
-          title="Estudiante 2 (sin proyecto)"
-        >
-          👩‍🎓 Est2
-        </button>
-        <button 
-          className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE3.cedula ? 'active' : ''}`}
-          onClick={() => cambiarUsuario('ESTUDIANTE3')}
-          title="Estudiante 3 (para crear proyecto)"
-        >
-          🧑‍🎓 Est3
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function AppContent() {
+  const { usuario, isAuthenticated, loading } = useAuth();
   const [menuActivo, setMenuActivo] = useState('Dashboard');
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+        <p>Cargando...</p>
+      </div>
+    );
+  }
+
+  // Si no está autenticado, mostrar página de login
+  if (!isAuthenticated || !usuario) {
+    return <LoginPage />;
+  }
 
   const handleMenuClick = (menu) => {
     setMenuActivo(menu);
@@ -85,13 +48,7 @@ function AppContent() {
           </div>
         );
       case 'Reuniones':
-        return (
-          <div className="vista-placeholder">
-            <span className="placeholder-icon">📅</span>
-            <h2>Mis Reuniones</h2>
-            <p>Próximamente podrás agendar y visualizar las reuniones con tu director.</p>
-          </div>
-        );
+        return <DashboardUnificado vistaActiva="reuniones" />;
       case 'Comités':
         return (
           <div className="vista-placeholder">
@@ -109,7 +66,6 @@ function AppContent() {
     <MainLayout 
       menuActivo={menuActivo} 
       onMenuClick={handleMenuClick}
-      selectorUsuarios={<SelectorUsuarios />}
     >
       {renderContenido()}
     </MainLayout>

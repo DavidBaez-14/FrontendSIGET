@@ -118,9 +118,9 @@ function DashboardUnificado({ vistaForzada = null, vistaActiva = 'dashboard' }) 
         abrirModalCambioEstado(proyecto);
     };
 
-    const handleAgendarReunion = () => {
-        setModalProximamente({ abierto: true, tipo: 'reunion' });
-    };
+    // const handleAgendarReunion = () => {
+    //     setModalProximamente({ abierto: true, tipo: 'reunion' });
+    // };
 
     const handleVerHistorial = async (proyecto) => {
         await abrirHistorial(proyecto);
@@ -254,7 +254,7 @@ function DashboardUnificado({ vistaForzada = null, vistaActiva = 'dashboard' }) 
         stats,
         onCambiarEstado: handleCambiarEstado,
         onVerHistorial: handleVerHistorial,
-        onAgendarReunion: handleAgendarReunion,
+        // onAgendarReunion: handleAgendarReunion, // Removido - los dashboards usan sus propias implementaciones
         onVerDetalle: handleVerDetalle
     };
 
@@ -291,10 +291,11 @@ function DashboardUnificado({ vistaForzada = null, vistaActiva = 'dashboard' }) 
                         onProyectoCreado={handleProyectoCreado}
                         onDirectorInvitado={handleDirectorInvitado}
                         onCancelarInvitacionDirector={handleCancelarInvitacionDirector}
-                        onAgendarReunion={handleAgendarReunion}
+                        // onAgendarReunion removido - DashboardEstudiante tiene su propia implementación
                         onVerHistorial={handleVerHistorial}
                         onVerDetalle={handleVerDetalle}
                         onRecargarDatos={cargarDatosEstudiante}
+                        vistaActiva={vistaActiva}
                     />
                     {renderModalesCompartidos()}
                 </>

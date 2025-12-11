@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
 import StatsCard from '../compartidos/componentes/StatsCard';
 import TablaProyectos from '../compartidos/componentes/TablaProyectos';
 import ProyectoCard from '../proyectos/componentes/ProyectoCard';
+import ModalSolicitarReunion from '../reuniones/ModalSolicitarReunion';
+import ReunionCard from '../reuniones/ReunionCard';
+import { reunionesService } from '../services/api';
 import './DashboardUnificado.css';
 
 /**
@@ -17,9 +21,64 @@ function DashboardDirector({
     vistaActiva = 'dashboard',
     onCambiarEstado,
     onVerHistorial,
-    onAgendarReunion,
     onVerDetalle
 }) {
+    // Estados para reuniones
+    const [reuniones, setReuniones] = useState([]);
+    const [cargandoReuniones, setCargandoReuniones] = useState(false);
+    const [modalSolicitarReunion, setModalSolicitarReunion] = useState(false);
+    const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+    const [receptorReunion, setReceptorReunion] = useState(null);
+
+    const cargarReuniones = async () => {
+        console.log('🔄 Cargando reuniones para director:', usuario.cedula);
+        setCargandoReuniones(true);
+        try {
+            const response = await reunionesService.obtenerPorDirector(usuario.cedula);
+            console.log('✅ Reuniones recibidas:', response);
+            console.log('📊 Cantidad de reuniones:', response.data?.length || 0);
+            setReuniones(response.data || []);
+        } catch (error) {
+            console.error('❌ Error al cargar reuniones:', error);
+            alert('Error al cargar reuniones: ' + error.message);
+        } finally {
+            setCargandoReuniones(false);
+        }
+    };
+
+    // Cargar reuniones cuando la vista es 'reuniones'
+    useEffect(() => {
+        if (vistaActiva === 'reuniones' && usuario?.cedula) {
+            cargarReuniones();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [vistaActiva, usuario]);
+
+    const handleAbrirModalReunion = (proyecto) => {
+        console.log('🔔 Director: handleAbrirModalReunion llamado con proyecto:', proyecto);
+        
+        if (!proyecto.estudiantes || proyecto.estudiantes.length === 0) {
+            console.warn('⚠️ Proyecto sin estudiantes');
+            alert('Este proyecto no tiene estudiantes asignados');
+            return;
+        }
+        const estudiantePrincipal = proyecto.estudiantes[0];
+        console.log('👨‍🎓 Estudiante principal:', estudiantePrincipal);
+        
+        setProyectoSeleccionado(proyecto);
+        setReceptorReunion({
+            cedula: estudiantePrincipal.cedula,
+            nombre: `${estudiantePrincipal.nombres || estudiantePrincipal.nombre} ${estudiantePrincipal.apellidos || ''}`
+        });
+        setModalSolicitarReunion(true);
+        console.log('✅ Modal de reunión abierto para director');
+    };
+
+    const handleReunionSolicitada = () => {
+        setModalSolicitarReunion(false);
+        cargarReuniones();
+    };
+
     if (loading) {
         return (
             <div className="dashboard-container">
@@ -37,6 +96,46 @@ function DashboardDirector({
                 <div className="error-container">
                     <p className="error-message">❌ {error}</p>
                 </div>
+            </div>
+        );
+    }
+
+    // Vista de REUNIONES
+    if (vistaActiva === 'reuniones') {
+        return (
+            <div className="dashboard-container">
+                <div className="dashboard-header director-header">
+                    <h1>
+                        <span className="saludo">Mis Reuniones</span>
+                        <span className="nombre">{usuario.nombre}</span>
+                    </h1>
+                    <p className="subtitulo">Gestiona las reuniones con tus estudiantes</p>
+                </div>
+
+                {cargandoReuniones ? (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>Cargando reuniones...</p>
+                    </div>
+                ) : reuniones.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-state-icon">📅</div>
+                        <h3>No tienes reuniones programadas</h3>
+                        <p>Las reuniones solicitadas por tus estudiantes aparecerán aquí.</p>
+                    </div>
+                ) : (
+                    <div className="reuniones-grid">
+                        {reuniones.map((reunion) => (
+                            <ReunionCard
+                                key={reunion.id}
+                                reunion={reunion}
+                                usuario={usuario}
+                                onReunionActualizada={cargarReuniones}
+                            />
+                        ))}
+                    </div>
+                )}
+
             </div>
         );
     }
@@ -104,7 +203,7 @@ function DashboardDirector({
                                     proyecto={proyecto}
                                     onVerDetalle={onVerDetalle}
                                     onVerHistorial={onVerHistorial}
-                                    onAgendarReunion={onAgendarReunion}
+                                    onAgendarReunion={() => handleAbrirModalReunion(proyecto)}
                                     esDirector={true}
                                 />
                             ))}
@@ -136,12 +235,24 @@ function DashboardDirector({
                             acciones={{
                                 onCambiarEstado,
                                 onVerHistorial,
-                                onAgendarReunion,
+                                onAgendarReunion: handleAbrirModalReunion,
                                 onVerDetalle
                             }}
                         />
                     )}
                 </div>
+            )}
+
+            {/* Modal Solicitar Reunión - Disponible para todas las vistas */}
+            {modalSolicitarReunion && proyectoSeleccionado && receptorReunion && (
+                <ModalSolicitarReunion
+                    proyecto={proyectoSeleccionado}
+                    usuario={usuario}
+                    receptorCedula={receptorReunion.cedula}
+                    receptorNombre={receptorReunion.nombre}
+                    onCerrar={() => setModalSolicitarReunion(false)}
+                    onReunionSolicitada={handleReunionSolicitada}
+                />
             )}
         </div>
     );

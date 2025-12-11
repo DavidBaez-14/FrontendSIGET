@@ -1,4 +1,6 @@
-import { LayoutDashboard, FolderKanban, Users, Calendar, FileText, User } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, Calendar, FileText, User, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import NotificacionesDropdown from './NotificacionesDropdown';
 import './NavBar.css';
 import logoUfps from '../../assets/logo_tesis_ufps.png';
@@ -23,6 +25,8 @@ const MENUS_POR_ROL = {
 };
 
 function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'Dashboard', onMenuClick }) {
+    const { logout } = useAuth();
+    const [dropdownAbierto, setDropdownAbierto] = useState(false);
     const menuItems = MENUS_POR_ROL[rol] || MENUS_POR_ROL.ESTUDIANTE;
 
     const handleMenuClick = (e, label) => {
@@ -30,6 +34,16 @@ function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'D
         if (onMenuClick) {
             onMenuClick(label);
         }
+    };
+
+    const handleLogout = () => {
+        if (window.confirm('¿Estás seguro de cerrar sesión?')) {
+            logout();
+        }
+    };
+
+    const toggleDropdown = () => {
+        setDropdownAbierto(!dropdownAbierto);
     };
 
     return (
@@ -53,8 +67,8 @@ function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'D
                                     className="navbar-link"
                                     onClick={(e) => handleMenuClick(e, item.label)}
                                 >
-                                    <IconComponent className="navbar-icon" size={20} strokeWidth={2} />
-                                    <span className="navbar-label">{item.label}</span>
+                                    <IconComponent size={18} strokeWidth={2} />
+                                    <span>{item.label}</span>
                                 </a>
                             </li>
                         );
@@ -65,9 +79,42 @@ function NavBar({ nombreUsuario = 'Usuario', rol = 'ESTUDIANTE', menuActivo = 'D
                     {/* Notificaciones para estudiantes y directores */}
                     {(rol === 'ESTUDIANTE' || rol === 'DIRECTOR') && <NotificacionesDropdown />}
                     
-                    <div className="navbar-user">
-                        <User className="user-icon-svg" size={18} strokeWidth={2} />
-                        <span className="user-name">{nombreUsuario.split(' ').slice(0, 2).join(' ')}</span>
+                    <div className="navbar-user-container">
+                        <div 
+                            className="navbar-user" 
+                            onClick={toggleDropdown}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <User className="user-icon-svg" size={18} strokeWidth={2} />
+                            <span className="user-name">{nombreUsuario.split(' ').slice(0, 2).join(' ')}</span>
+                        </div>
+
+                        {/* Dropdown de usuario */}
+                        {dropdownAbierto && (
+                            <>
+                                <div 
+                                    className="dropdown-overlay" 
+                                    onClick={() => setDropdownAbierto(false)}
+                                />
+                                <div className="navbar-dropdown">
+                                    <div className="dropdown-header">
+                                        <User size={24} />
+                                        <div>
+                                            <p className="dropdown-nombre">{nombreUsuario}</p>
+                                            <p className="dropdown-rol">{rol}</p>
+                                        </div>
+                                    </div>
+                                    <div className="dropdown-divider" />
+                                    <button 
+                                        className="dropdown-item logout"
+                                        onClick={handleLogout}
+                                    >
+                                        <LogOut size={18} />
+                                        <span>Cerrar Sesión</span>
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -53,7 +53,14 @@ function ProyectoCard({
 
     const handleButtonClick = (e, callback) => {
         e.stopPropagation();
-        if (callback) callback(proyecto);
+        console.log('🖱️ ProyectoCard: botón clickeado, callback existe?', !!callback);
+        console.log('📦 Proyecto a pasar:', proyecto);
+        if (callback) {
+            callback(proyecto);
+            console.log('✅ Callback ejecutado');
+        } else {
+            console.error('❌ No hay callback definido!');
+        }
     };
 
     return (
