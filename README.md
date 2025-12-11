@@ -31,6 +31,31 @@ Frontend del Sistema Integral de Gestión de Tesis (SIGET) de la UFPS. Esta apli
 
 ---
 
+## 🏗️ Arquitectura Refactorizada (Diciembre 2025)
+
+El Dashboard principal fue refactorizado siguiendo el patrón **Container/Presenter**:
+
+```
+src/vistas/
+├── DashboardUnificado.jsx        → Contenedor principal (orchestrator)
+├── DashboardAdmin.jsx            → Vista para Admins/Coordinadores
+├── DashboardDirector.jsx         → Vista para Directores
+└── DashboardEstudiante.jsx       → Vista para Estudiantes
+
+src/compartidos/backup/
+└── DashboardUnificado.old.jsx    → Versión original (backup)
+```
+
+**Beneficios:**
+- ✅ Separación de responsabilidades (SRP)
+- ✅ Componentes más pequeños y testeables (~100-400 líneas vs 1124)
+- ✅ Mantenimiento más sencillo
+- ✅ Mejor performance (solo renderiza componente necesario)
+
+📖 **Docs completas:** Ver `REFACTORIZACION_DASHBOARD.md` y `TESTING_DASHBOARD.md`
+
+---
+
 ## ⚙️ Instalación
 
 ### Requisitos previos

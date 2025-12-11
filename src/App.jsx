@@ -20,42 +20,42 @@ function SelectorUsuarios() {
           onClick={() => cambiarUsuario('ADMIN_GENERAL')}
           title="Super Administrador General"
         >
-          👑
+          👑 Admin
         </button>
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.ADMIN_SISTEMAS.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('ADMIN_SISTEMAS')}
           title="Coordinador Comité Sistemas"
         >
-          📋
+          📋 Coord
         </button>
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.DIRECTOR.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('DIRECTOR')}
           title="Director de Tesis"
         >
-          👨‍🏫
+          👨‍🏫 Director
         </button>
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('ESTUDIANTE')}
           title="Estudiante (con proyecto)"
         >
-          👨‍🎓
+          👨‍🎓 Est1
         </button>
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE2.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('ESTUDIANTE2')}
           title="Estudiante 2 (sin proyecto)"
         >
-          👩‍🎓
+          👩‍🎓 Est2
         </button>
         <button 
           className={`selector-btn ${usuario.cedula === usuariosPrueba.ESTUDIANTE3.cedula ? 'active' : ''}`}
           onClick={() => cambiarUsuario('ESTUDIANTE3')}
           title="Estudiante 3 (para crear proyecto)"
         >
-          🧑‍🎓
+          🧑‍🎓 Est3
         </button>
       </div>
     </div>

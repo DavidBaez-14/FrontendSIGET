@@ -953,26 +953,50 @@
 .btn-crear-proyecto {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #ef042b 0%, #b90321 100%);
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
+    border-radius: 16px;
+    font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(239, 4, 43, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    min-width: 280px;
+}
+
+.btn-crear-proyecto::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-crear-proyecto:hover::before {
+    left: 100%;
 }
 
 .btn-crear-proyecto:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(239, 4, 43, 0.4);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+}
+
+.btn-crear-proyecto:active {
+    transform: translateY(-2px) scale(0.98);
 }
 
 .btn-crear-proyecto span {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .info-cards-grid {
@@ -1423,6 +1447,15 @@
     gap: 0.5rem;
 }
 
+.timeline-fecha {
+    color: #718096;
+}
+
+.timeline-usuario {
+    color: #4a5568;
+    font-weight: 500;
+}
+
 .loading-historial,
 .sin-historial {
     text-align: center;
@@ -1465,32 +1498,8 @@
    ============================================ */
 
 .modal-proximamente {
-    max-width: 420px;
+    max-width: 500px;
     text-align: center;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.modal-proximamente .modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(0, 0, 0, 0.1);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    color: #4a5568;
-}
-
-.modal-proximamente .modal-close:hover {
-    background: rgba(0, 0, 0, 0.15);
 }
 
 .proximamente-content {

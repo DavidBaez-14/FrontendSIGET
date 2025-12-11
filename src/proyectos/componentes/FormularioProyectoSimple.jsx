@@ -34,7 +34,7 @@ function FormularioProyectoSimple({ cedulaEstudiante, onClose, onProyectoCreado 
             setLoadingCatalogos(true);
             const [modalidadesData, lineasData] = await Promise.all([
                 catalogosService.obtenerModalidades(),
-                catalogosService.obtenerLineasInvestigacion()
+                catalogosService.obtenerLineas()
             ]);
             setModalidades(modalidadesData);
             setLineasInvestigacion(lineasData);
@@ -74,24 +74,30 @@ function FormularioProyectoSimple({ cedulaEstudiante, onClose, onProyectoCreado 
             setError('Debes seleccionar una línea de investigación');
             return;
         }
-        
+
         try {
             setLoading(true);
             setError(null);
             
             const proyectoData = {
-                titulo: formData.titulo,
-                descripcion: formData.descripcion,
-                objetivoGeneral: formData.objetivoGeneral,
+                titulo: formData.titulo.trim(),
+                descripcion: formData.descripcion.trim(),
+                objetivoGeneral: formData.objetivoGeneral.trim(),
                 modalidadId: parseInt(formData.modalidadId),
                 lineaInvestigacionId: parseInt(formData.lineaInvestigacionId)
             };
 
             const nuevoProyecto = await proyectosService.crearProyecto(cedulaEstudiante, proyectoData);
-            onProyectoCreado(nuevoProyecto);
-            onClose();
+            
+            if (onProyectoCreado) {
+                onProyectoCreado(nuevoProyecto);
+            }
+            
+            if (onClose) {
+                onClose();
+            }
         } catch (err) {
-            setError(err.message || 'Error al crear el proyecto');
+            setError(err.response?.data?.message || 'Error al crear el proyecto. Intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -99,10 +105,10 @@ function FormularioProyectoSimple({ cedulaEstudiante, onClose, onProyectoCreado 
 
     if (loadingCatalogos) {
         return (
-            <div className="modal-overlay">
-                <div className="formulario-simple-modal">
-                    <div className="loading-catalogos">
-                        <div className="loading-spinner"></div>
+            <div className="modal-overlay-simple">
+                <div className="modal-simple">
+                    <div className="modal-simple-loading">
+                        <div className="spinner"></div>
                         <p>Cargando formulario...</p>
                     </div>
                 </div>
@@ -111,154 +117,135 @@ function FormularioProyectoSimple({ cedulaEstudiante, onClose, onProyectoCreado 
     }
 
     return (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="formulario-simple-modal">
-                <button className="modal-close" onClick={onClose}>×</button>
-                
-                <div className="formulario-header">
-                    <h2>🎓 Crear Proyecto de Grado</h2>
-                    <p className="formulario-subtitle">
-                        Completa la información básica de tu proyecto. Más adelante podrás invitar compañeros y solicitar un director.
-                    </p>
+        <div className="modal-overlay-simple" onClick={onClose}>
+            <div className="modal-simple" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-simple-header">
+                    <div>
+                        <span className="header-icon">📝</span>
+                        <h2>Crear Proyecto de Grado</h2>
+                    </div>
+                    <button className="btn-close" onClick={onClose}>×</button>
+                </div>
+
+                <div className="modal-simple-instrucciones">
+                    <p>Completa la información básica de tu proyecto. Más adelante podrás invitar compañeros y solicitar un director.</p>
                 </div>
 
                 {error && (
-                    <div className="formulario-error">
-                        ⚠️ {error}
+                    <div className="error-alert">
+                        <span className="error-icon">⚠️</span>
+                        <span>{error}</span>
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="formulario-simple">
-                    {/* Título */}
-                    <div className="form-group">
-                        <label htmlFor="titulo" className="form-label">
+                <form onSubmit={handleSubmit} className="form-simple">
+                    <div className="form-simple-group">
+                        <label>
                             Título del Proyecto <span className="required">*</span>
                         </label>
                         <input
                             type="text"
-                            id="titulo"
                             name="titulo"
                             value={formData.titulo}
                             onChange={handleChange}
                             placeholder="Ej: Sistema de gestión de proyectos de grado"
-                            className="form-input"
                             maxLength={300}
-                            required
+                            disabled={loading}
                         />
-                        <small className="form-hint">{formData.titulo.length}/300 caracteres</small>
+                        <small>{formData.titulo.length}/300 caracteres</small>
                     </div>
 
-                    {/* Descripción */}
-                    <div className="form-group">
-                        <label htmlFor="descripcion" className="form-label">
+                    <div className="form-simple-group">
+                        <label>
                             Descripción <span className="required">*</span>
                         </label>
                         <textarea
-                            id="descripcion"
                             name="descripcion"
                             value={formData.descripcion}
                             onChange={handleChange}
                             placeholder="Describe brevemente de qué trata tu proyecto..."
-                            className="form-textarea"
                             rows={4}
-                            required
+                            disabled={loading}
                         />
                     </div>
 
-                    {/* Objetivo General */}
-                    <div className="form-group">
-                        <label htmlFor="objetivoGeneral" className="form-label">
+                    <div className="form-simple-group">
+                        <label>
                             Objetivo General <span className="required">*</span>
                         </label>
                         <textarea
-                            id="objetivoGeneral"
                             name="objetivoGeneral"
                             value={formData.objetivoGeneral}
                             onChange={handleChange}
                             placeholder="¿Qué buscas lograr con este proyecto?"
-                            className="form-textarea"
                             rows={3}
-                            required
+                            disabled={loading}
                         />
                     </div>
 
-                    {/* Modalidad */}
-                    <div className="form-group">
-                        <label htmlFor="modalidadId" className="form-label">
-                            Modalidad <span className="required">*</span>
-                        </label>
-                        <select
-                            id="modalidadId"
-                            name="modalidadId"
-                            value={formData.modalidadId}
-                            onChange={handleChange}
-                            className="form-select"
-                            required
-                        >
-                            <option value="">Selecciona una modalidad</option>
-                            {modalidades.map(modalidad => (
-                                <option key={modalidad.id} value={modalidad.id}>
-                                    {modalidad.nombre}
-                                </option>
-                            ))}
-                        </select>
-                        {formData.modalidadId && (
-                            <small className="form-info">
-                                💡 {modalidades.find(m => m.id === parseInt(formData.modalidadId))?.descripcion}
-                            </small>
-                        )}
+                    <div className="form-simple-row">
+                        <div className="form-simple-group">
+                            <label>
+                                Modalidad <span className="required">*</span>
+                            </label>
+                            <select
+                                name="modalidadId"
+                                value={formData.modalidadId}
+                                onChange={handleChange}
+                                disabled={loading}
+                            >
+                                <option value="">Selecciona una modalidad</option>
+                                {modalidades.map(mod => (
+                                    <option key={mod.id} value={mod.id}>
+                                        {mod.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-simple-group">
+                            <label>
+                                Línea de Investigación <span className="required">*</span>
+                            </label>
+                            <select
+                                name="lineaInvestigacionId"
+                                value={formData.lineaInvestigacionId}
+                                onChange={handleChange}
+                                disabled={loading}
+                            >
+                                <option value="">Selecciona una línea</option>
+                                {lineasInvestigacion.map(linea => (
+                                    <option key={linea.id} value={linea.id}>
+                                        {linea.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
-                    {/* Línea de Investigación */}
-                    <div className="form-group">
-                        <label htmlFor="lineaInvestigacionId" className="form-label">
-                            Línea de Investigación <span className="required">*</span>
-                        </label>
-                        <select
-                            id="lineaInvestigacionId"
-                            name="lineaInvestigacionId"
-                            value={formData.lineaInvestigacionId}
-                            onChange={handleChange}
-                            className="form-select"
-                            required
-                        >
-                            <option value="">Selecciona una línea de investigación</option>
-                            {lineasInvestigacion.map(linea => (
-                                <option key={linea.id} value={linea.id}>
-                                    {linea.nombre}
-                                </option>
-                            ))}
-                        </select>
-                        {formData.lineaInvestigacionId && (
-                            <small className="form-info">
-                                📊 {lineasInvestigacion.find(l => l.id === parseInt(formData.lineaInvestigacionId))?.descripcion}
-                            </small>
-                        )}
-                    </div>
-
-                    {/* Botones */}
-                    <div className="formulario-acciones">
-                        <button
-                            type="button"
+                    <div className="modal-simple-footer">
+                        <button 
+                            type="button" 
+                            className="btn-secondary" 
                             onClick={onClose}
-                            className="btn-cancelar"
                             disabled={loading}
                         >
                             Cancelar
                         </button>
-                        <button
-                            type="submit"
-                            className="btn-crear"
+                        <button 
+                            type="submit" 
+                            className="btn-primary"
                             disabled={loading}
                         >
                             {loading ? (
                                 <>
-                                    <div className="btn-spinner"></div>
+                                    <span className="spinner-small"></span>
                                     Creando...
                                 </>
                             ) : (
                                 <>
-                                    ✓ Crear Proyecto
+                                    <span>✨</span>
+                                    Crear Proyecto
                                 </>
                             )}
                         </button>

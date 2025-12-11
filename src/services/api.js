@@ -1,7 +1,7 @@
 const API_BASE_URL = 'http://localhost:8080';
 
 export const proyectosService = {
-    async obtenerProyectosPorDirector(cedula) {
+    async obtenerProyectosDirector(cedula) {
         const response = await fetch(`${API_BASE_URL}/proyectos/director/${cedula}`);
         if (!response.ok) {
             throw new Error('Error al obtener proyectos');
@@ -9,7 +9,7 @@ export const proyectosService = {
         return response.json();
     },
 
-    async obtenerProyectoPorEstudiante(cedula) {
+    async obtenerProyectoEstudiante(cedula) {
         const response = await fetch(`${API_BASE_URL}/proyectos/estudiante/${cedula}`);
         if (response.status === 404) {
             return null; // El estudiante no tiene proyecto
@@ -35,7 +35,7 @@ export const proyectosService = {
         return response.json();
     },
 
-    async obtenerTodosLosProyectos() {
+    async obtenerTodos() {
         const response = await fetch(`${API_BASE_URL}/proyectos`);
         if (!response.ok) {
             throw new Error('Error al obtener todos los proyectos');
@@ -57,8 +57,10 @@ export const proyectosService = {
             throw new Error('Error al obtener proyectos del administrador');
         }
         return response.json();
-    },
+    }
+};
 
+export const adminService = {
     async obtenerInfoAdmin(cedulaAdmin) {
         const response = await fetch(`${API_BASE_URL}/proyectos/admin/${cedulaAdmin}/info`);
         if (!response.ok) {
@@ -272,10 +274,6 @@ export const notificacionesService = {
         return response.json();
     },
 
-    // ========================================
-    // ENDPOINTS PARA DIRECTORES
-    // ========================================
-
     async buscarDirectores(busqueda = '') {
         const url = busqueda 
             ? `${API_BASE_URL}/api/notificaciones/buscar-directores?busqueda=${encodeURIComponent(busqueda)}`
@@ -339,7 +337,7 @@ export const notificacionesService = {
         return response.json();
     },
 
-    async obtenerInvitacionPendienteProyecto(proyectoId, cedulaEstudiante) {
+    async obtenerInvitacionPendienteProyecto(proyectoId) {
         try {
             const response = await fetch(`${API_BASE_URL}/api/notificaciones/proyecto/${proyectoId}/invitacion-pendiente`);
             if (!response.ok) {
@@ -349,7 +347,7 @@ export const notificacionesService = {
             const data = await response.json();
             
             if (data.invitacion) {
-                console.log('✅ Invitación pendiente encontrada:', data.invitacion.metadata?.directorNombre);
+                console.log('Invitación pendiente encontrada:', data.invitacion.metadata?.directorNombre);
             } else {
                 console.log('ℹ️ No hay invitación pendiente para el proyecto', proyectoId);
             }
@@ -362,9 +360,9 @@ export const notificacionesService = {
 };
 
 // Exports directos para facilitar el uso
-export const obtenerProyectosPorDirector = (cedula) => proyectosService.obtenerProyectosPorDirector(cedula);
-export const obtenerProyectosPorEstudiante = (cedula) => proyectosService.obtenerProyectoPorEstudiante(cedula);
+export const obtenerProyectosDirector = (cedula) => proyectosService.obtenerProyectosDirector(cedula);
+export const obtenerProyectoEstudiante = (cedula) => proyectosService.obtenerProyectoEstudiante(cedula);
 export const obtenerProyectosPorAdmin = (cedula) => proyectosService.obtenerProyectosPorAdmin(cedula);
-export const obtenerInfoAdmin = (cedula) => proyectosService.obtenerInfoAdmin(cedula);
+export const obtenerInfoAdmin = (cedula) => adminService.obtenerInfoAdmin(cedula);
 export const obtenerHistorialProyecto = (proyectoId) => historialService.obtenerHistorialProyecto(proyectoId);
 export const crearProyecto = (cedula, data) => proyectosService.crearProyecto(cedula, data);
