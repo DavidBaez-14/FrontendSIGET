@@ -15,6 +15,9 @@ import axios from 'axios';
  * - Usar useAuth() en cualquier componente
  */
 
+// URL base del backend (misma que api.js)
+const API_BASE_URL = 'https://siget-ufps-tc3x8.ondigitalocean.app';
+
 // Crear el contexto
 const AuthContext = createContext(null);
 
@@ -65,7 +68,7 @@ export function AuthProvider({ children }) {
      */
     const login = async (cedula, password) => {
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/login', {
+            const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
                 cedula,
                 password
             });
@@ -134,5 +137,3 @@ export function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
-
-export default AuthContext;
