@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://siget-ufps-tc3x8.ondigitalocean.app';
 
 export const proyectosService = {
     async obtenerProyectosDirector(cedula) {
